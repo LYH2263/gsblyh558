@@ -34,6 +34,9 @@ public class ExamController {
     com.exam.system.service.QuestionService questionService;
 
     @Autowired
+    com.exam.system.service.ExamService examService;
+
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -55,58 +58,11 @@ public class ExamController {
     public ApiResponse<ExamResult> submitExam(@PathVariable Long id, @Valid @RequestBody ExamSubmission submission) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        
+
         log.info("User [{}] is submitting exam [ID: {}]", username, id);
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("未找到该用户"));
-
-        Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("未找到 ID 为 " + id + " 的考试"));
-
-        int totalScore = 0;
-        Map<Long, String> answers = submission.getAnswers();
-
-        for (ExamQuestion examQuestion : exam.getQuestions()) {
-            Question question = examQuestion.getQuestion();
-            String userAnswer = answers.get(question.getId());
-            
-            boolean isCorrect = questionService.isAnswerCorrect(question, userAnswer);
-
-            if (isCorrect) {
-                totalScore += examQuestion.getScore();
-                // Remove from wrong question book if it exists
-                wrongQuestionRecordRepository
-                        .findByUserIdAndQuestionIdAndIsRemovedFalse(user.getId(), question.getId())
-                        .ifPresent(wr -> {
-                            wr.setIsRemoved(true);
-                            wr.setRemoveTime(LocalDateTime.now());
-                            wrongQuestionRecordRepository.save(wr);
-                            log.info("Question [ID: {}] removed from user [{}] wrong question book because it was answered correctly in exam [ID: {}].", question.getId(), username, id);
-                        });
-            } else {
-                // Add to wrong question book
-                log.info("User [{}] answered question [ID: {}] incorrectly in exam [ID: {}]. Adding/Updating wrong question book.", username, question.getId(), id);
-                WrongQuestionRecord wrongRecord = wrongQuestionRecordRepository
-                        .findByUserIdAndQuestionIdAndIsRemovedFalse(user.getId(), question.getId())
-                        .orElse(new WrongQuestionRecord());
-                
-                wrongRecord.setUser(user);
-                wrongRecord.setQuestion(question);
-                wrongRecord.setIsRemoved(false);
-                wrongRecord.setLastWrongTime(LocalDateTime.now());
-                wrongQuestionRecordRepository.save(wrongRecord);
-            }
-        }
-
-        ExamResult result = new ExamResult();
-        result.setUser(user);
-        result.setExam(exam);
-        result.setScore(totalScore);
-        
-        ExamResult savedResult = examResultRepository.save(result);
-        log.info("User [{}] finished exam [ID: {}] with score: {}", username, id, totalScore);
-        
+        // 交卷业务（评分、错题本、场次超时判定、结果落库）集中在 Service 层
+        ExamResult savedResult = examService.submitExam(id, username, submission);
         return ApiResponse.success(savedResult);
     }
 
