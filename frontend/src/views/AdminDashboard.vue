@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
-import request from '../utils/request'
+import { categoryApi } from '../api/categories'
+import { questionApi } from '../api/questions'
+import { examApi } from '../api/exams'
+import { sessionApi } from '../api/sessions'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
 
@@ -126,7 +129,7 @@ const openExamModal = (exam = null) => {
 
 const fetchAvailableQuestions = async () => {
   // Fetch all questions for selection (optimize in real app with pagination/search API)
-  const res = await request.get('/api/questions?size=1000')
+  const res = await questionApi.list({ size: 1000 })
   availableQuestions.value = res.data.data.content
 }
 
@@ -177,9 +180,9 @@ const saveExam = async () => {
 
   try {
     if (newExam.value.id) {
-      await request.put(`/api/exams/${newExam.value.id}`, newExam.value)
+      await examApi.update(newExam.value.id, newExam.value)
     } else {
-      await request.post('/api/exams', newExam.value)
+      await examApi.create(newExam.value)
     }
     showExamModal.value = false
     fetchExams()
@@ -193,7 +196,7 @@ const saveExam = async () => {
 const deleteExam = (id) => {
   confirmDelete('确定要删除这个考试吗？', async () => {
     try {
-      await request.delete(`/api/exams/${id}`)
+      await examApi.remove(id)
       fetchExams()
       toast.success('考试删除成功')
     } catch (error) {
@@ -205,7 +208,7 @@ const deleteExam = (id) => {
 
 const fetchCategories = async () => {
   try {
-    const res = await request.get('/api/categories')
+    const res = await categoryApi.list()
     categories.value = res.data.data
   } catch (error) {
     console.error('Failed to fetch categories:', error)
@@ -214,7 +217,7 @@ const fetchCategories = async () => {
 
 const addCategory = async () => {
   try {
-    await request.post('/api/categories', newCategory.value)
+    await categoryApi.create(newCategory.value)
     newCategory.value = { name: '', description: '' }
     fetchCategories()
     toast.success('分类添加成功')
@@ -226,13 +229,11 @@ const addCategory = async () => {
 
 const fetchQuestions = async (page = 0) => {
   try {
-    const res = await request.get('/api/questions', {
-      params: { 
-        page, 
-        size: questionSize.value,
-        sortField: 'id',
-        sortDir: 'asc'
-      }
+    const res = await questionApi.list({
+      page,
+      size: questionSize.value,
+      sortField: 'id',
+      sortDir: 'asc'
     })
     questions.value = res.data.data
   } catch (error) {
@@ -306,9 +307,9 @@ const saveQuestion = async () => {
     }
     
     if (payload.id) {
-      await request.put(`/api/questions/${payload.id}`, payload)
+      await questionApi.update(payload.id, payload)
     } else {
-      await request.post('/api/questions', payload)
+      await questionApi.create(payload)
     }
     showQuestionModal.value = false
     fetchQuestions(questions.value.number)
@@ -322,7 +323,7 @@ const saveQuestion = async () => {
 const deleteQuestion = (id) => {
   confirmDelete('确定要删除这个题目吗？', async () => {
     try {
-      await request.delete(`/api/questions/${id}`)
+      await questionApi.remove(id)
       fetchQuestions(questions.value.number)
       toast.success('题目删除成功')
     } catch (error) {
@@ -334,11 +335,194 @@ const deleteQuestion = (id) => {
 
 const fetchExams = async () => {
   try {
-    const res = await request.get('/api/exams')
+    const res = await examApi.list()
     exams.value = res.data.data
   } catch (error) {
     console.error('Failed to fetch exams:', error)
   }
+}
+
+// ========== Session Management ==========
+const sessions = ref([])
+const sessionExamFilter = ref(null)
+const sessionStatusFilter = ref(null)
+const showSessionModal = ref(false)
+const editingSession = ref({
+  id: null,
+  examId: null,
+  startTime: '',
+  durationHours: 1,
+  capacity: 20,
+  lateEntryMinutes: 10,
+  maxSwitchCount: 3
+})
+
+const sessionStatusMap = {
+  DRAFT: { label: '草稿', class: 'bg-light text-secondary' },
+  OPEN: { label: '开放中', class: 'bg-success-soft text-success' },
+  CLOSED: { label: '已下线', class: 'bg-danger-soft text-danger' },
+  FINISHED: { label: '已结束', class: 'bg-light text-secondary' }
+}
+
+const toDateTimeLocal = (iso) => (iso ? iso.slice(0, 16) : '')
+
+const formatDateTime = (iso) => {
+  if (!iso) return '-'
+  return iso.replace('T', ' ').slice(0, 16)
+}
+
+const fetchSessions = async () => {
+  try {
+    const res = await sessionApi.adminList(sessionExamFilter.value || undefined, sessionStatusFilter.value || undefined)
+    sessions.value = res.data.data
+  } catch (error) {
+    console.error('Failed to fetch sessions:', error)
+  }
+}
+
+watch([sessionExamFilter, sessionStatusFilter], fetchSessions)
+
+const openSessionModal = (session = null) => {
+  if (session) {
+    editingSession.value = {
+      id: session.id,
+      examId: session.examId,
+      startTime: toDateTimeLocal(session.startTime),
+      // 落库口径为分钟整数，表单按小时展示（支持 1.5 小时这类小数）
+      durationHours: session.durationMinutes / 60,
+      capacity: session.capacity,
+      lateEntryMinutes: session.lateEntryMinutes ?? 10,
+      maxSwitchCount: session.maxSwitchCount ?? 3
+    }
+  } else {
+    editingSession.value = {
+      id: null,
+      examId: sessionExamFilter.value || (exams.value[0]?.id ?? null),
+      startTime: '',
+      durationHours: 1,
+      capacity: 20,
+      lateEntryMinutes: 10,
+      maxSwitchCount: 3
+    }
+  }
+  showSessionModal.value = true
+}
+
+const saveSession = async () => {
+  // 小时 -> 分钟整数转换，API 与落库口径保持「分钟」不变
+  const durationMinutes = Math.round(parseFloat(editingSession.value.durationHours) * 60)
+  const payload = {
+    examId: editingSession.value.examId,
+    startTime: editingSession.value.startTime,
+    durationMinutes: durationMinutes,
+    capacity: parseInt(editingSession.value.capacity),
+    lateEntryMinutes: parseInt(editingSession.value.lateEntryMinutes),
+    maxSwitchCount: parseInt(editingSession.value.maxSwitchCount)
+  }
+  if (!payload.examId) {
+    toast.warning('请选择所属考试')
+    return
+  }
+  if (!payload.startTime) {
+    toast.warning('请设定开始时间')
+    return
+  }
+  if (!Number.isFinite(durationMinutes) || durationMinutes < 1) {
+    toast.warning('考试时长换算后至少为 1 分钟')
+    return
+  }
+  if (!Number.isInteger(payload.lateEntryMinutes) || payload.lateEntryMinutes < 0) {
+    toast.warning('迟到宽限量不能为负数')
+    return
+  }
+  if (!Number.isInteger(payload.maxSwitchCount) || payload.maxSwitchCount < 1) {
+    toast.warning('切屏次数上限至少为 1 次')
+    return
+  }
+  try {
+    if (editingSession.value.id) {
+      await sessionApi.update(editingSession.value.id, payload)
+    } else {
+      await sessionApi.create(payload)
+    }
+    showSessionModal.value = false
+    fetchSessions()
+    toast.success('场次保存成功')
+  } catch (error) {
+    console.error('Failed to save session:', error)
+    toast.error('保存失败: ' + (error.response?.data?.message || error.message))
+  }
+}
+
+const closeSession = (session) => {
+  const message = session.bookedCount > 0
+    ? `该场次已有 ${session.bookedCount} 人预约，下线后他们将无法参加考试。确定要下线该场次吗？`
+    : '该场次暂无预约，确定要下线吗？'
+  confirmDelete(message, async () => {
+    try {
+      const res = await sessionApi.close(session.id)
+      fetchSessions()
+      toast.success(res.data.message || '场次已下线')
+    } catch (error) {
+      console.error('Failed to close session:', error)
+      toast.error('下线失败: ' + (error.response?.data?.message || error.message))
+    }
+  })
+}
+
+// ========== Session Stats Dashboard ==========
+const sessionStats = ref([])
+const statsExamFilter = ref(null)
+const statsStatusFilter = ref(null)
+
+const fetchSessionStats = async () => {
+  try {
+    const res = await sessionApi.adminStats(statsExamFilter.value || undefined, statsStatusFilter.value || undefined)
+    sessionStats.value = res.data.data
+  } catch (error) {
+    console.error('Failed to fetch session stats:', error)
+  }
+}
+
+watch([statsExamFilter, statsStatusFilter], fetchSessionStats)
+
+const csvEscape = (value) => {
+  const s = String(value ?? '')
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s
+}
+
+const exportStatsCsv = () => {
+  if (sessionStats.value.length === 0) {
+    toast.warning('暂无可导出的数据')
+    return
+  }
+  const header = ['场次ID', '所属考试', '开始时间', '时长(分钟)', '状态', '预约人数', '实际开考人数', '按时完成人数', '超时交卷人数', '切屏强制交卷人数', '平均用时(分钟)']
+  const rows = sessionStats.value.map(s => [
+    s.sessionId,
+    s.examTitle,
+    formatDateTime(s.startTime),
+    s.durationMinutes,
+    sessionStatusMap[s.status]?.label || s.status,
+    s.bookedCount,
+    s.startedCount,
+    s.finishedCount,
+    s.timeoutCount,
+    s.forcedCount,
+    s.avgUsedMinutes
+  ])
+  // BOM 保证 Excel 打开中文不乱码
+  const csv = '﻿' + [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const examTitle = statsExamFilter.value
+    ? (exams.value.find(e => e.id === statsExamFilter.value)?.title || '场次')
+    : '全部场次'
+  const date = new Date().toISOString().slice(0, 10)
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `场次数据看板_${examTitle}_${date}.csv`
+  link.click()
+  URL.revokeObjectURL(link.href)
+  toast.success('CSV 已导出')
 }
 
 const getQuestionTypeLabel = (type) => {
@@ -352,8 +536,8 @@ const getQuestionTypeLabel = (type) => {
   return map[type] || '题目'
 }
 
-watch([showQuestionModal, showExamModal], ([newQ, newE]) => {
-  if (newQ || newE) {
+watch([showQuestionModal, showExamModal, showSessionModal], ([newQ, newE, newS]) => {
+  if (newQ || newE || newS) {
     document.body.style.overflow = 'hidden'
   } else {
     document.body.style.overflow = ''
@@ -365,7 +549,9 @@ onMounted(async () => {
   await Promise.all([
     fetchCategories(),
     fetchQuestions(),
-    fetchExams()
+    fetchExams(),
+    fetchSessions(),
+    fetchSessionStats()
   ])
   isLoading.value = false
 })
@@ -643,6 +829,12 @@ onMounted(async () => {
             <li class="nav-item">
               <button class="nav-link px-4 py-2 rounded-3 fw-bold d-flex align-items-center" :class="{ active: activeTab === 'exams' }" @click="activeTab = 'exams'">考试管理</button>
             </li>
+            <li class="nav-item">
+              <button class="nav-link px-4 py-2 rounded-3 fw-bold d-flex align-items-center" :class="{ active: activeTab === 'sessions' }" @click="activeTab = 'sessions'">场次管理</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link px-4 py-2 rounded-3 fw-bold d-flex align-items-center" :class="{ active: activeTab === 'stats' }" @click="activeTab = 'stats'">数据看板</button>
+            </li>
           </ul>
 
           <div v-if="activeTab === 'categories'" class="fade-in">
@@ -789,10 +981,202 @@ onMounted(async () => {
               </table>
             </div>
           </div>
+          <div v-if="activeTab === 'sessions'" class="fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h3 class="fw-bold h4 mb-0">场次管理</h3>
+              <button class="btn btn-primary px-4 py-2 shadow-sm" @click="openSessionModal(null)">
+                <i class="bi bi-plus-lg me-2"></i>创建场次
+              </button>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <select v-model="sessionExamFilter" class="form-select border-0 bg-light py-2 shadow-sm rounded-3">
+                  <option :value="null">全部考试</option>
+                  <option v-for="exam in exams" :key="exam.id" :value="exam.id">{{ exam.title }}</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select v-model="sessionStatusFilter" class="form-select border-0 bg-light py-2 shadow-sm rounded-3">
+                  <option :value="null">全部状态</option>
+                  <option v-for="(info, status) in sessionStatusMap" :key="status" :value="status">{{ info.label }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th width="70">ID</th>
+                    <th>所属考试</th>
+                    <th width="160">开始时间</th>
+                    <th width="100">时长</th>
+                    <th width="90">已预约</th>
+                    <th width="80">容量</th>
+                    <th width="100">已开考人数</th>
+                    <th width="100">状态</th>
+                    <th width="180">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="session in sessions" :key="session.id">
+                    <td class="text-secondary small">#{{ session.id }}</td>
+                    <td class="fw-bold">{{ session.examTitle }}</td>
+                    <td><span class="text-secondary small"><i class="bi bi-calendar-event me-1"></i>{{ formatDateTime(session.startTime) }}</span></td>
+                    <td><span class="text-secondary small"><i class="bi bi-clock me-1"></i>{{ session.durationMinutes }} 分钟</span></td>
+                    <td>
+                      <span class="badge" :class="session.bookedCount > 0 ? 'bg-primary-soft text-primary' : 'bg-light text-secondary'">
+                        {{ session.bookedCount }}
+                      </span>
+                    </td>
+                    <td><span class="text-secondary">{{ session.capacity }}</span></td>
+                    <td>
+                      <span class="badge" :class="session.startedCount > 0 ? 'bg-success-soft text-success' : 'bg-light text-secondary'">
+                        {{ session.startedCount }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge" :class="sessionStatusMap[session.status]?.class || 'bg-light text-secondary'">
+                        {{ sessionStatusMap[session.status]?.label || session.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-light text-primary px-3" @click="openSessionModal(session)" :disabled="session.status === 'CLOSED' || session.status === 'FINISHED'">编辑</button>
+                        <button v-if="session.status !== 'CLOSED'" class="btn btn-sm btn-light text-danger px-3" @click="closeSession(session)">下线</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="sessions.length === 0">
+                    <td colspan="9" class="text-center text-secondary py-5">
+                      <i class="bi bi-calendar-x d-block display-6 mb-3 opacity-25"></i>暂无场次，点击右上角创建
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div v-if="activeTab === 'stats'" class="fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h3 class="fw-bold h4 mb-0">场次数据看板</h3>
+              <button class="btn btn-primary px-4 py-2 shadow-sm" @click="exportStatsCsv">
+                <i class="bi bi-download me-2"></i>导出 CSV
+              </button>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <select v-model="statsExamFilter" class="form-select border-0 bg-light py-2 shadow-sm rounded-3">
+                  <option :value="null">全部考试</option>
+                  <option v-for="exam in exams" :key="exam.id" :value="exam.id">{{ exam.title }}</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select v-model="statsStatusFilter" class="form-select border-0 bg-light py-2 shadow-sm rounded-3">
+                  <option :value="null">全部状态</option>
+                  <option v-for="(info, status) in sessionStatusMap" :key="status" :value="status">{{ info.label }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>场次</th>
+                    <th width="90">预约人数</th>
+                    <th width="100">开考人数</th>
+                    <th width="100">按时完成</th>
+                    <th width="100">超时交卷</th>
+                    <th width="120">切屏强制交卷</th>
+                    <th width="110">平均用时</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="stat in sessionStats" :key="stat.sessionId">
+                    <td>
+                      <div class="fw-bold">{{ stat.examTitle }}</div>
+                      <div class="text-secondary small">
+                        <i class="bi bi-calendar-event me-1"></i>{{ formatDateTime(stat.startTime) }}
+                        <span class="badge ms-2" :class="sessionStatusMap[stat.status]?.class || 'bg-light text-secondary'">
+                          {{ sessionStatusMap[stat.status]?.label || stat.status }}
+                        </span>
+                      </div>
+                    </td>
+                    <td><span class="badge bg-primary-soft text-primary">{{ stat.bookedCount }}</span></td>
+                    <td><span class="badge bg-light text-secondary">{{ stat.startedCount }}</span></td>
+                    <td><span class="badge bg-success-soft text-success">{{ stat.finishedCount }}</span></td>
+                    <td><span class="badge" :class="stat.timeoutCount > 0 ? 'bg-danger-soft text-danger' : 'bg-light text-secondary'">{{ stat.timeoutCount }}</span></td>
+                    <td><span class="badge" :class="stat.forcedCount > 0 ? 'bg-danger-soft text-danger' : 'bg-light text-secondary'">{{ stat.forcedCount }}</span></td>
+                    <td><span class="text-secondary small"><i class="bi bi-stopwatch me-1"></i>{{ stat.avgUsedMinutes }} 分钟</span></td>
+                  </tr>
+                  <tr v-if="sessionStats.length === 0">
+                    <td colspan="7" class="text-center text-secondary py-5">
+                      <i class="bi bi-bar-chart d-block display-6 mb-3 opacity-25"></i>暂无统计数据
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    
+
+    <!-- Session Modal -->
+    <div v-if="showSessionModal" class="modal-backdrop-apple fade show" @click="showSessionModal = false"></div>
+    <div v-if="showSessionModal" class="modal-apple fade show d-block" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="apple-modal-content border-0">
+          <div class="apple-modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title fw-bold">{{ editingSession.id ? '编辑场次' : '创建场次' }}</h5>
+            <button type="button" class="btn-close" @click="showSessionModal = false"></button>
+          </div>
+          <div class="apple-modal-body py-4">
+            <form id="sessionForm" @submit.prevent="saveSession">
+              <div class="row g-4">
+                <div class="col-md-12">
+                  <label class="form-label">所属考试</label>
+                  <select v-model="editingSession.examId" class="form-select rounded-4" :disabled="!!editingSession.id" required>
+                    <option :value="null" disabled>选择考试</option>
+                    <option v-for="exam in exams" :key="exam.id" :value="exam.id">{{ exam.title }}</option>
+                  </select>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">开始时间</label>
+                  <input type="datetime-local" v-model="editingSession.startTime" class="form-control rounded-4 py-3" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">考试时长（小时，可填小数如 1.5）</label>
+                  <input type="number" v-model="editingSession.durationHours" class="form-control rounded-4 py-3" min="0.02" step="0.5" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">最大预约人数</label>
+                  <input type="number" v-model="editingSession.capacity" class="form-control rounded-4 py-3" min="1" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">迟到宽限量（分钟）</label>
+                  <input type="number" v-model="editingSession.lateEntryMinutes" class="form-control rounded-4 py-3" min="0" step="1" required>
+                  <div class="form-text">场次开始后该分钟内仍允许进入作答，默认 10 分钟</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">切屏次数上限（次）</label>
+                  <input type="number" v-model="editingSession.maxSwitchCount" class="form-control rounded-4 py-3" min="1" step="1" required>
+                  <div class="form-text">达到该次数将强制交卷，默认 3 次</div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="apple-modal-footer">
+            <button type="button" class="btn btn-secondary flex-grow-1 py-3" @click="showSessionModal = false">取消</button>
+            <button type="submit" form="sessionForm" class="btn btn-primary flex-grow-1 py-3 shadow-sm">保存场次</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="modal-backdrop-apple fade show" @click="showDeleteModal = false"></div>
     <div v-if="showDeleteModal" class="modal-apple fade show d-block" tabindex="-1">
