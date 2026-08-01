@@ -24,7 +24,23 @@ public class ExamResult {
     @JsonIgnore
     private Exam exam;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
+    @JsonIgnore
+    private ExamSession session;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id")
+    @JsonIgnore
+    private SessionReservation reservation;
+
     private Integer score;
+
+    @Column(name = "is_timeout")
+    private Boolean timeout;
+
+    @Column(name = "screen_switch_forced")
+    private Boolean screenSwitchForced;
 
     @CreationTimestamp
     private LocalDateTime submitTime;

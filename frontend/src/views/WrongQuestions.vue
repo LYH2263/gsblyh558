@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import request from '../utils/request'
+import { listWrongQuestions } from '../api/wrongQuestions'
+import { submitPractice } from '../api/practice'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -41,8 +42,8 @@ const formatAnswer = (answer, type) => {
 const fetchWrongQuestions = async () => {
   loading.value = true
   try {
-    const res = await request.get('/api/wrong-questions')
-    wrongRecords.value = res.data.data
+    const res = await listWrongQuestions()
+    wrongRecords.value = res.data
   } finally {
     loading.value = false
   }
@@ -56,12 +57,12 @@ const submitAnswer = async () => {
     userAnswer.value = multiChoiceAnswers.value.sort().join(',')
   }
   
-  const res = await request.post('/api/practice/submit', {
+  const res = await submitPractice({
     questionId: question.id,
     userAnswer: userAnswer.value
   })
   
-  const isCorrect = res.data.data
+  const isCorrect = res.data
   result.value = isCorrect ? '回答正确! 已从错题本移除。' : '回答错误。正确答案: ' + formatAnswer(question.answer, question.type)
   
   // Wait for result to render and scroll it into view

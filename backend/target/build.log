@@ -1,0 +1,639 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.exam:system >---------------------------
+[INFO] Building exam-system 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ system ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ system ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 63 source files with javac [debug release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[4,30] �޷�����com.exam.system.entity.SessionStatus
+  �����Դ�ļ�: D:\Agsb731\gsblyh558\backend\src\main\java\com\exam\system\entity\SessionStatus.java
+    �ļ���������com.exam.system.entity.SessionStatus
+    ��ɾ�����ļ���ȷ�����ļ�λ����ȷ��Դ·����Ŀ¼�С�
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[20,13] �Ҳ�������
+  ����:   �� SessionStatus
+  λ��: �� com.exam.system.dto.SessionResponse
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionUpdateRequest.java:[20,13] �Ҳ�������
+  ����:   �� SessionStatus
+  λ��: �� com.exam.system.dto.SessionUpdateRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionCreateRequest.java:[28,13] �Ҳ�������
+  ����:   �� SessionStatus
+  λ��: �� com.exam.system.dto.SessionCreateRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/repository/ExamSessionRepository.java:[20,55] �Ҳ�������
+  ����:   �� SessionStatus
+  λ��: �ӿ� com.exam.system.repository.ExamSessionRepository
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[38,45] �Ҳ�������
+  ����:   ���� getCategory()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[39,41] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[40,44] �Ҳ�������
+  ����:   ���� getContent()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[41,44] �Ҳ�������
+  ����:   ���� getOptions()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[42,43] �Ҳ�������
+  ����:   ���� getAnswer()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[43,45] �Ҳ�������
+  ����:   ���� getAnalysis()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[44,47] �Ҳ�������
+  ����:   ���� getDifficulty()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[54,13] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[54,76] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[59,40] �Ҳ�������
+  ����:   ���� getAnswer()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[61,21] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[69,21] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[69,107] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[80,29] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[86,21] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[86,108] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[90,17] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[90,96] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/security/UserDetailsServiceImpl.java:[27,21] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/security/UserDetailsServiceImpl.java:[28,21] �Ҳ�������
+  ����:   ���� getPassword()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/security/UserDetailsServiceImpl.java:[29,84] �Ҳ�������
+  ����:   ���� getRole()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[46,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[46,57] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.LoginRequest�ı��� loginRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[49,69] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.LoginRequest�ı��� loginRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[49,97] �Ҳ�������
+  ����:   ���� getPassword()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.LoginRequest�ı��� loginRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[62,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[62,61] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[64,21] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[65,21] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[66,21] �Ҳ�������
+  ����:   ���� getEmail()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[72,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[72,59] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[73,56] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[74,13] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[74,88] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[82,39] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[83,54] �Ҳ�������
+  ����:   ���� getPassword()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[84,36] �Ҳ�������
+  ����:   ���� getEmail()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[86,26] �Ҳ�������
+  ����:   ���� getRole()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[87,39] �Ҳ�������
+  ����:   ���� getRole()
+  λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[89,17] �Ҳ�������
+  ����:   ���� setRole(com.exam.system.entity.Role)
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[94,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[94,58] �Ҳ�������
+  ����:   ���� getUsername()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[26,31] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[27,35] �Ҳ�������
+  ����:   ���� getExam()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[28,38] �Ҳ�������
+  ����:   ���� getExam()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[29,38] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[30,44] �Ҳ�������
+  ����:   ���� getDurationMinutes()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[31,37] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[32,17] �Ҳ�������
+  ����:   ���� setBookedCount(int)
+  λ��: ����Ϊcom.exam.system.dto.SessionResponse�ı��� response
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[33,32] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[34,17] �Ҳ�������
+  ����:   ���� setRemainingSlots(int)
+  λ��: ����Ϊcom.exam.system.dto.SessionResponse�ı��� response
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[35,35] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[36,38] �Ҳ�������
+  ����:   ���� getCreatedAt()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[37,38] �Ҳ�������
+  ����:   ���� getUpdatedAt()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/ReservationController.java:[32,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.controller.ReservationController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[53,52] �Ҳ�������
+  ����:   ���� getExamId()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[59,20] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[66,16] �Ҳ�������
+  ����:   ���� setExam(com.exam.system.entity.Exam)
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[67,37] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[68,43] �Ҳ�������
+  ����:   ���� getDurationMinutes()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[69,36] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,16] �Ҳ�������
+  ����:   ���� setStatus(request.ge[...]DRAFT)
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,34] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,64] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,79] �Ҳ�������
+  ����:   ���� SessionStatus
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[73,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[73,80] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� saved
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[73,94] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.Exam�ı��� exam
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[87,20] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[88,24] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[93,40] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[95,20] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[96,41] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[98,20] �Ҳ�������
+  ����:   ���� getDurationMinutes()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[99,47] �Ҳ�������
+  ����:   ���� getDurationMinutes()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[101,20] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[102,38] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[106,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[121,31] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� r
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[125,20] �Ҳ�������
+  ����:   ���� setStatus(com.exam.system.entity.ReservationStatus)
+  λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� booking
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[129,27] �Ҳ�������
+  ����:   ���� SessionStatus
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[132,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[133,16] �޷����� com.exam.system.dto.OfflineSessionResponse�еĹ����� OfflineSessionResponseӦ�õ���������;
+  ��Ҫ: û�в���
+  �ҵ�:    java.lang.Long,int
+  ԭ��: ʵ�ʲ����б����ʽ�����б���Ȳ�ͬ
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[146,80] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� s
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[165,88] �Ҳ�������
+  ����:   ���� SessionStatus
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[168,31] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� s
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[169,46] ����������Ч
+  �Ҳ�������
+    ����:   ���� getStartTime()
+    λ��: �� com.exam.system.entity.ExamSession
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[186,20] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[186,36] �Ҳ�������
+  ����:   ���� SessionStatus
+  λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[193,73] �Ҳ�������
+  ����:   ���� getStartTime()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[201,32] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[208,35] �Ҳ�������
+  ����:   ���� getCapacity()
+  λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[215,20] �Ҳ�������
+  ����:   ���� setSession(com.exam.system.entity.ExamSession)
+  λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� reservation
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[216,20] �Ҳ�������
+  ����:   ���� setUser(com.exam.system.entity.User)
+  λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� reservation
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.456 s
+[INFO] Finished at: 2026-08-01T21:52:01+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project system: Compilation failure: Compilation failure: 
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[4,30] �޷�����com.exam.system.entity.SessionStatus
+[ERROR]   �����Դ�ļ�: D:\Agsb731\gsblyh558\backend\src\main\java\com\exam\system\entity\SessionStatus.java
+[ERROR]     �ļ���������com.exam.system.entity.SessionStatus
+[ERROR]     ��ɾ�����ļ���ȷ�����ļ�λ����ȷ��Դ·����Ŀ¼�С�
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[20,13] �Ҳ�������
+[ERROR]   ����:   �� SessionStatus
+[ERROR]   λ��: �� com.exam.system.dto.SessionResponse
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionUpdateRequest.java:[20,13] �Ҳ�������
+[ERROR]   ����:   �� SessionStatus
+[ERROR]   λ��: �� com.exam.system.dto.SessionUpdateRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionCreateRequest.java:[28,13] �Ҳ�������
+[ERROR]   ����:   �� SessionStatus
+[ERROR]   λ��: �� com.exam.system.dto.SessionCreateRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/repository/ExamSessionRepository.java:[20,55] �Ҳ�������
+[ERROR]   ����:   �� SessionStatus
+[ERROR]   λ��: �ӿ� com.exam.system.repository.ExamSessionRepository
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[38,45] �Ҳ�������
+[ERROR]   ����:   ���� getCategory()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[39,41] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[40,44] �Ҳ�������
+[ERROR]   ����:   ���� getContent()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[41,44] �Ҳ�������
+[ERROR]   ����:   ���� getOptions()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[42,43] �Ҳ�������
+[ERROR]   ����:   ���� getAnswer()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[43,45] �Ҳ�������
+[ERROR]   ����:   ���� getAnalysis()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[44,47] �Ҳ�������
+[ERROR]   ����:   ���� getDifficulty()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� questionDetails
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[54,13] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[54,76] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[59,40] �Ҳ�������
+[ERROR]   ����:   ���� getAnswer()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[61,21] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[69,21] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[69,107] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[80,29] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[86,21] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[86,108] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[90,17] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.QuestionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/QuestionService.java:[90,96] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Question�ı��� question
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/security/UserDetailsServiceImpl.java:[27,21] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/security/UserDetailsServiceImpl.java:[28,21] �Ҳ�������
+[ERROR]   ����:   ���� getPassword()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/security/UserDetailsServiceImpl.java:[29,84] �Ҳ�������
+[ERROR]   ����:   ���� getRole()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[46,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[46,57] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.LoginRequest�ı��� loginRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[49,69] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.LoginRequest�ı��� loginRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[49,97] �Ҳ�������
+[ERROR]   ����:   ���� getPassword()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.LoginRequest�ı��� loginRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[62,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[62,61] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[64,21] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[65,21] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[66,21] �Ҳ�������
+[ERROR]   ����:   ���� getEmail()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[72,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[72,59] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[73,56] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[74,13] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[74,88] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[82,39] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[83,54] �Ҳ�������
+[ERROR]   ����:   ���� getPassword()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[84,36] �Ҳ�������
+[ERROR]   ����:   ���� getEmail()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[86,26] �Ҳ�������
+[ERROR]   ����:   ���� getRole()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[87,39] �Ҳ�������
+[ERROR]   ����:   ���� getRole()
+[ERROR]   λ��: ����Ϊ@jakarta.validation.Valid com.exam.system.payload.request.SignupRequest�ı��� signUpRequest
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[89,17] �Ҳ�������
+[ERROR]   ����:   ���� setRole(com.exam.system.entity.Role)
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[94,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.controller.AuthController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/AuthController.java:[94,58] �Ҳ�������
+[ERROR]   ����:   ���� getUsername()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[26,31] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[27,35] �Ҳ�������
+[ERROR]   ����:   ���� getExam()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[28,38] �Ҳ�������
+[ERROR]   ����:   ���� getExam()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[29,38] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[30,44] �Ҳ�������
+[ERROR]   ����:   ���� getDurationMinutes()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[31,37] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[32,17] �Ҳ�������
+[ERROR]   ����:   ���� setBookedCount(int)
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionResponse�ı��� response
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[33,32] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[34,17] �Ҳ�������
+[ERROR]   ����:   ���� setRemainingSlots(int)
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionResponse�ı��� response
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[35,35] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[36,38] �Ҳ�������
+[ERROR]   ����:   ���� getCreatedAt()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/dto/SessionResponse.java:[37,38] �Ҳ�������
+[ERROR]   ����:   ���� getUpdatedAt()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/controller/ReservationController.java:[32,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.controller.ReservationController
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[53,52] �Ҳ�������
+[ERROR]   ����:   ���� getExamId()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[59,20] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[66,16] �Ҳ�������
+[ERROR]   ����:   ���� setExam(com.exam.system.entity.Exam)
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[67,37] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[68,43] �Ҳ�������
+[ERROR]   ����:   ���� getDurationMinutes()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[69,36] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,16] �Ҳ�������
+[ERROR]   ����:   ���� setStatus(request.ge[...]DRAFT)
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,34] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,64] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionCreateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[70,79] �Ҳ�������
+[ERROR]   ����:   ���� SessionStatus
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[73,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[73,80] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� saved
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[73,94] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.Exam�ı��� exam
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[87,20] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[88,24] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[93,40] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[95,20] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[96,41] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[98,20] �Ҳ�������
+[ERROR]   ����:   ���� getDurationMinutes()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[99,47] �Ҳ�������
+[ERROR]   ����:   ���� getDurationMinutes()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[101,20] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[102,38] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.dto.SessionUpdateRequest�ı��� request
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[106,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[121,31] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� r
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[125,20] �Ҳ�������
+[ERROR]   ����:   ���� setStatus(com.exam.system.entity.ReservationStatus)
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� booking
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[129,27] �Ҳ�������
+[ERROR]   ����:   ���� SessionStatus
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[132,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[133,16] �޷����� com.exam.system.dto.OfflineSessionResponse�еĹ����� OfflineSessionResponseӦ�õ���������;
+[ERROR]   ��Ҫ: û�в���
+[ERROR]   �ҵ�:    java.lang.Long,int
+[ERROR]   ԭ��: ʵ�ʲ����б����ʽ�����б���Ȳ�ͬ
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[146,80] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� s
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[165,88] �Ҳ�������
+[ERROR]   ����:   ���� SessionStatus
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[168,31] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� s
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[169,46] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getStartTime()
+[ERROR]     λ��: �� com.exam.system.entity.ExamSession
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[186,20] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[186,36] �Ҳ�������
+[ERROR]   ����:   ���� SessionStatus
+[ERROR]   λ��: �� com.exam.system.service.ExamSessionService
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[193,73] �Ҳ�������
+[ERROR]   ����:   ���� getStartTime()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[201,32] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.User�ı��� user
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[208,35] �Ҳ�������
+[ERROR]   ����:   ���� getCapacity()
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.ExamSession�ı��� session
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[215,20] �Ҳ�������
+[ERROR]   ����:   ���� setSession(com.exam.system.entity.ExamSession)
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� reservation
+[ERROR] /D:/Agsb731/gsblyh558/backend/src/main/java/com/exam/system/service/ExamSessionService.java:[216,20] �Ҳ�������
+[ERROR]   ����:   ���� setUser(com.exam.system.entity.User)
+[ERROR]   λ��: ����Ϊcom.exam.system.entity.SessionReservation�ı��� reservation
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

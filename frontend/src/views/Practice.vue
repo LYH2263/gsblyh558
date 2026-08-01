@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import request from '../utils/request'
+import { listCategories } from '../api/categories'
+import { listQuestions } from '../api/questions'
+import { submitPractice } from '../api/practice'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -44,8 +46,8 @@ const formatAnswer = (answer, type) => {
 const fetchCategories = async () => {
   loading.value = true
   try {
-    const res = await request.get('/api/categories')
-    categories.value = res.data.data
+    const res = await listCategories()
+    categories.value = res.data
   } finally {
     loading.value = false
   }
@@ -55,16 +57,14 @@ const startPractice = async () => {
   loading.value = true
   try {
     const sortField = practiceMode.value === 'random' ? 'random' : 'id'
-    const res = await request.get('/api/questions', {
-      params: { 
-        size: 100,
-        categoryId: selectedCategoryId.value,
-        sortField: sortField,
-        sortDir: 'asc'
-      }
+    const res = await listQuestions({
+      size: 100,
+      categoryId: selectedCategoryId.value,
+      sortField: sortField,
+      sortDir: 'asc'
     })
-    
-    questions.value = res.data.data.content
+
+    questions.value = res.data.content
     currentQuestionIndex.value = 0
     result.value = null
     userAnswer.value = ''
@@ -81,11 +81,11 @@ const submitAnswer = async () => {
     userAnswer.value = multiChoiceAnswers.value.sort().join(',')
   }
 
-  const res = await request.post('/api/practice/submit', {
+  const res = await submitPractice({
     questionId: question.id,
     userAnswer: userAnswer.value
   })
-  result.value = res.data.data ? '回答正确!' : '回答错误! 正确答案: ' + formatAnswer(question.answer, question.type)
+  result.value = res.data ? '回答正确!' : '回答错误! 正确答案: ' + formatAnswer(question.answer, question.type)
   
   // Wait for result to render and scroll it into view
   nextTick(() => {
