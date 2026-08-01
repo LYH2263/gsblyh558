@@ -1,8 +1,22 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
-import request from '../utils/request'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
+import { listCategories, createCategory as createCategoryApi } from '../api/categories'
+import {
+  listQuestions as listQuestionsApi,
+  createQuestion as createQuestionApi,
+  updateQuestion as updateQuestionApi,
+  deleteQuestion as deleteQuestionApi
+} from '../api/questions'
+import {
+  listExams as listExamsApi,
+  createExam as createExamApi,
+  updateExam as updateExamApi,
+  deleteExam as deleteExamApi
+} from '../api/exams'
+import AdminSessionsPanel from '../components/AdminSessionsPanel.vue'
+import AdminDashboardPanel from '../components/AdminDashboardPanel.vue'
 
 const authStore = useAuthStore()
 const toast = useToast()
@@ -126,8 +140,8 @@ const openExamModal = (exam = null) => {
 
 const fetchAvailableQuestions = async () => {
   // Fetch all questions for selection (optimize in real app with pagination/search API)
-  const res = await request.get('/api/questions?size=1000')
-  availableQuestions.value = res.data.data.content
+  const res = await listQuestionsApi({ size: 1000 })
+  availableQuestions.value = res.data.content
 }
 
 const filteredQuestions = computed(() => {
@@ -177,9 +191,9 @@ const saveExam = async () => {
 
   try {
     if (newExam.value.id) {
-      await request.put(`/api/exams/${newExam.value.id}`, newExam.value)
+      await updateExamApi(newExam.value.id, newExam.value)
     } else {
-      await request.post('/api/exams', newExam.value)
+      await createExamApi(newExam.value)
     }
     showExamModal.value = false
     fetchExams()
@@ -193,7 +207,7 @@ const saveExam = async () => {
 const deleteExam = (id) => {
   confirmDelete('确定要删除这个考试吗？', async () => {
     try {
-      await request.delete(`/api/exams/${id}`)
+      await deleteExamApi(id)
       fetchExams()
       toast.success('考试删除成功')
     } catch (error) {
@@ -205,8 +219,8 @@ const deleteExam = (id) => {
 
 const fetchCategories = async () => {
   try {
-    const res = await request.get('/api/categories')
-    categories.value = res.data.data
+    const res = await listCategories()
+    categories.value = res.data
   } catch (error) {
     console.error('Failed to fetch categories:', error)
   }
@@ -214,7 +228,7 @@ const fetchCategories = async () => {
 
 const addCategory = async () => {
   try {
-    await request.post('/api/categories', newCategory.value)
+    await createCategoryApi(newCategory.value)
     newCategory.value = { name: '', description: '' }
     fetchCategories()
     toast.success('分类添加成功')
@@ -226,15 +240,13 @@ const addCategory = async () => {
 
 const fetchQuestions = async (page = 0) => {
   try {
-    const res = await request.get('/api/questions', {
-      params: { 
-        page, 
-        size: questionSize.value,
-        sortField: 'id',
-        sortDir: 'asc'
-      }
+    const res = await listQuestionsApi({
+      page,
+      size: questionSize.value,
+      sortField: 'id',
+      sortDir: 'asc'
     })
-    questions.value = res.data.data
+    questions.value = res.data
   } catch (error) {
     console.error('Failed to fetch questions:', error)
   }
@@ -306,9 +318,9 @@ const saveQuestion = async () => {
     }
     
     if (payload.id) {
-      await request.put(`/api/questions/${payload.id}`, payload)
+      await updateQuestionApi(payload.id, payload)
     } else {
-      await request.post('/api/questions', payload)
+      await createQuestionApi(payload)
     }
     showQuestionModal.value = false
     fetchQuestions(questions.value.number)
@@ -322,7 +334,7 @@ const saveQuestion = async () => {
 const deleteQuestion = (id) => {
   confirmDelete('确定要删除这个题目吗？', async () => {
     try {
-      await request.delete(`/api/questions/${id}`)
+      await deleteQuestionApi(id)
       fetchQuestions(questions.value.number)
       toast.success('题目删除成功')
     } catch (error) {
@@ -334,8 +346,8 @@ const deleteQuestion = (id) => {
 
 const fetchExams = async () => {
   try {
-    const res = await request.get('/api/exams')
-    exams.value = res.data.data
+    const res = await listExamsApi()
+    exams.value = res.data
   } catch (error) {
     console.error('Failed to fetch exams:', error)
   }
@@ -643,6 +655,14 @@ onMounted(async () => {
             <li class="nav-item">
               <button class="nav-link px-4 py-2 rounded-3 fw-bold d-flex align-items-center" :class="{ active: activeTab === 'exams' }" @click="activeTab = 'exams'">考试管理</button>
             </li>
+            <li class="nav-item">
+              <button class="nav-link px-4 py-2 rounded-3 fw-bold d-flex align-items-center" :class="{ active: activeTab === 'sessions' }" @click="activeTab = 'sessions'">场次预约</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link px-4 py-2 rounded-3 fw-bold d-flex align-items-center" :class="{ active: activeTab === 'dashboard' }" @click="activeTab = 'dashboard'">
+                <i class="bi bi-bar-chart-line me-2"></i>场次看板
+              </button>
+            </li>
           </ul>
 
           <div v-if="activeTab === 'categories'" class="fade-in">
@@ -788,6 +808,14 @@ onMounted(async () => {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <div v-if="activeTab === 'sessions'" class="fade-in">
+            <AdminSessionsPanel />
+          </div>
+
+          <div v-if="activeTab === 'dashboard'" class="fade-in">
+            <AdminDashboardPanel />
           </div>
         </div>
       </div>

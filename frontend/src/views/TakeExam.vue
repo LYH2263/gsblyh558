@@ -6,6 +6,24 @@
       </div>
       <p class="mt-3 text-secondary">正在为您准备试卷...</p>
     </div>
+
+    <div v-else-if="entryDenied" class="row justify-content-center fade-in-up">
+      <div class="col-md-8 col-lg-6">
+        <div class="glass-panel text-center py-5 px-4" style="border-radius: 32px;">
+          <i class="bi bi-shield-lock display-1 text-danger d-block mb-4"></i>
+          <h2 class="fw-bold mb-3">无法进入考试</h2>
+          <p class="text-secondary fs-5 mb-4">{{ deniedMessage }}</p>
+          <div class="d-flex justify-content-center gap-3">
+            <router-link to="/sessions" class="btn btn-primary px-5 py-3 shadow-sm rounded-4">
+              <span>返回场次预约</span>
+            </router-link>
+            <router-link to="/" class="btn btn-secondary px-5 py-3 rounded-4">
+              <span>回到首页</span>
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <div v-else-if="result" class="row justify-content-center fade-in-up">
       <div class="col-md-10 col-lg-9">
@@ -16,7 +34,9 @@
               <span class="score-total">/ {{ exam.totalScore }}</span>
             </div>
             <h2 class="fw-bold mb-2">考试已完成</h2>
-            <p class="text-secondary mb-0">系统已成功记录您的本次考试成绩</p>
+            <p v-if="resultScreenForced" class="text-danger mb-0">因切屏次数已达上限，本次考试被系统强制交卷，成绩按已作答内容计算。</p>
+            <p v-else-if="resultTimeout" class="text-secondary mb-0">本次作答超出作答窗口，已按超时自动提交并记录成绩</p>
+            <p v-else class="text-secondary mb-0">系统已成功记录您的本次考试成绩</p>
           </div>
           
           <div class="row g-4 mb-5 text-start px-md-5">
@@ -29,7 +49,7 @@
             <div class="col-6 col-md-4">
               <div class="p-3 rounded-4 bg-light">
                 <div class="small text-secondary mb-1">考试时长</div>
-                <div class="fw-bold">{{ exam.duration }} 分钟</div>
+                <div class="fw-bold">{{ displayDurationMinutes }} 分钟</div>
               </div>
             </div>
             <div class="col-12 col-md-4">
@@ -47,7 +67,7 @@
               <span>{{ showReview ? '隐藏解析' : '查看解析' }}</span>
               <i class="bi ms-2" :class="showReview ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
             </button>
-            <router-link to="/exams" class="btn btn-primary btn-lg px-4 px-md-5 py-3 shadow-sm rounded-4">
+            <router-link :to="isSessionMode ? '/sessions' : '/exams'" class="btn btn-primary btn-lg px-4 px-md-5 py-3 shadow-sm rounded-4">
               <span>返回列表</span>
             </router-link>
             <router-link to="/" class="btn btn-secondary btn-lg px-4 px-md-5 py-3 rounded-4">
@@ -92,19 +112,27 @@
       <div class="sticky-top glass-nav py-3 mb-5" style="z-index: 1020; top: 0; margin-top: 0; margin-left: -1rem; margin-right: -1rem;">
         <div class="container d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-secondary btn-sm p-2 rounded-3" @click="$router.push('/exams')">
+            <button class="btn btn-secondary btn-sm p-2 rounded-3" @click="goBack">
               <i class="bi bi-chevron-left"></i>
             </button>
             <h4 class="m-0 fw-bold text-truncate d-none d-sm-block" style="max-width: 400px;">{{ exam.title }}</h4>
           </div>
           <div class="d-flex align-items-center gap-4">
+            <div v-if="isSessionMode" class="text-end">
+              <div class="small text-secondary fw-600">切屏次数</div>
+              <div class="fw-bold fs-6" :class="screenSwitchCount >= screenSwitchLimit ? 'text-danger' : (screenSwitchCount > 0 ? 'text-warning' : 'text-success')">
+                {{ screenSwitchCount }} / {{ screenSwitchLimit }}
+              </div>
+            </div>
             <div class="text-end">
-              <div class="small text-secondary fw-600">剩余时间</div>
+              <div class="small text-secondary fw-600">{{ isSessionMode ? '距交卷' : '剩余时间' }}</div>
               <div class="fw-bold fs-5 tabular-nums" :class="{'text-danger animate-pulse': timeLeft < 300}">
                 {{ formatTime(timeLeft) }}
               </div>
             </div>
-            <button class="btn btn-primary px-4 py-2" @click="confirmSubmit">交卷</button>
+            <button class="btn btn-primary px-4 py-2" :disabled="submitting || forcedByScreen" @click="confirmSubmit">
+              {{ submitting ? '提交中...' : '交卷' }}
+            </button>
           </div>
         </div>
       </div>
@@ -114,7 +142,7 @@
           <div class="glass-panel mb-5 p-4" style="border-radius: 20px;">
             <p class="text-secondary mb-3">{{ exam.description }}</p>
             <div class="d-flex flex-wrap gap-4 text-secondary small fw-600">
-              <span><i class="bi bi-clock-history me-2"></i>限时: {{ exam.duration }} 分钟</span>
+              <span><i class="bi bi-clock-history me-2"></i>限时: {{ displayDurationMinutes }} 分钟</span>
               <span><i class="bi bi-list-check me-2"></i>题目: {{ exam.questions.length }} 题</span>
               <span><i class="bi bi-award me-2"></i>总分: {{ exam.totalScore }} 分</span>
             </div>
@@ -207,9 +235,10 @@
             </div>
 
             <div class="d-grid mt-5 mb-5">
-              <button type="submit" class="btn btn-primary btn-lg py-3 shadow-lg rounded-4">
-                <span>提交试卷</span>
-                <i class="bi bi-send-fill ms-2"></i>
+              <button type="submit" class="btn btn-primary btn-lg py-3 shadow-lg rounded-4" :disabled="submitting">
+                <span v-if="submitting">提交中...</span>
+                <span v-else>提交试卷</span>
+                <i v-if="!submitting" class="bi bi-send-fill ms-2"></i>
               </button>
             </div>
           </form>
@@ -237,7 +266,7 @@
           </div>
           <div class="apple-modal-footer">
             <button type="button" class="btn btn-secondary flex-grow-1 py-3" @click="showSubmitModal = false">继续检查</button>
-            <button type="button" class="btn btn-primary flex-grow-1 py-3 shadow-sm" @click="submitExam(true)">确认交卷</button>
+            <button type="button" class="btn btn-primary flex-grow-1 py-3 shadow-sm" :disabled="submitting" @click="submitExam(true)">确认交卷</button>
           </div>
         </div>
       </div>
@@ -345,25 +374,47 @@
 </style>
 
 <script setup>
-import { ref, onMounted, reactive, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
-import request from '../utils/request'
+import { ref, onMounted, reactive, onUnmounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getExam, submitExam as submitExamApi } from '../api/exams'
+import { enterSession, submitSessionExam, reportScreenSwitch } from '../api/sessions'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
+import { getErrorMessage } from '../utils/reservationMessages'
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 const exam = ref(null)
 const loading = ref(true)
+const entryDenied = ref(false)
+const deniedMessage = ref('')
 const answers = reactive({})
 const multiChoiceAnswers = reactive({})
 const result = ref(null)
+const resultTimeout = ref(false)
+const resultScreenForced = ref(false)
 const showReview = ref(false)
+
+const isSessionMode = computed(() => !!route.params.sessionId)
+const entryInfo = ref(null)
+const sessionId = computed(() => route.params.sessionId ? Number(route.params.sessionId) : null)
+const displayDurationMinutes = computed(() =>
+  isSessionMode.value && entryInfo.value ? entryInfo.value.durationMinutes : exam.value?.duration
+)
+const submitting = ref(false)
+
+// Screen switch proctoring
+const screenSwitchCount = ref(0)
+const screenSwitchLimit = ref(3)
+const forcedByScreen = ref(false)
+let switchReporting = false
 
 // Timer state
 const timeLeft = ref(0)
 let timerInterval = null
+let autoSubmitted = false
 
 const parseOptions = (options) => {
   if (!options) return []
@@ -423,14 +474,15 @@ const formatTime = (seconds) => {
 
 const pad = (num) => num.toString().padStart(2, '0')
 
-const startTimer = () => {
-  if (!exam.value) return
-  timeLeft.value = exam.value.duration * 60 // convert to seconds
-  
+const startTimer = (durationSeconds) => {
+  if (timerInterval) clearInterval(timerInterval)
+  timeLeft.value = durationSeconds
+
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
-    } else {
+    } else if (!autoSubmitted && !submitting.value) {
+      autoSubmitted = true
       clearInterval(timerInterval)
       toast.warning('考试时间到，系统将自动提交试卷！', 5000)
       submitExam(true) // force submit
@@ -438,22 +490,86 @@ const startTimer = () => {
   }, 1000)
 }
 
+const initMultiChoice = () => {
+  if (exam.value.questions) {
+    exam.value.questions.forEach(eq => {
+      if (eq.question.type === 'MULTI_CHOICE') {
+        multiChoiceAnswers[eq.question.id] = []
+      }
+    })
+  }
+}
+
+const handleVisibilityChange = async () => {
+  if (!isSessionMode.value) return
+  if (document.visibilityState !== 'hidden') return
+  if (forcedByScreen.value || submitting.value || result.value) return
+  if (switchReporting) return
+  switchReporting = true
+  try {
+    const res = await reportScreenSwitch(sessionId.value, {
+      reservationId: entryInfo.value.reservationId,
+      sessionId: sessionId.value,
+      answers: answers
+    })
+    const data = res.data
+    screenSwitchCount.value = data.screenSwitchCount
+    if (data.limitReached) {
+      forcedByScreen.value = true
+      resultScreenForced.value = true
+      resultTimeout.value = !!data.result?.timeout
+      result.value = data.result
+      if (timerInterval) clearInterval(timerInterval)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      toast.error(`切屏次数已达上限（${screenSwitchLimit.value} 次），系统已强制交卷`, 6000)
+    } else {
+      toast.warning(`检测到切屏，当前切屏次数 ${screenSwitchCount.value}/${screenSwitchLimit.value}`, 3000)
+    }
+  } catch (error) {
+    console.error('Failed to report screen switch:', error)
+    toast.error(getErrorMessage(error, '切屏上报失败'))
+  } finally {
+    switchReporting = false
+  }
+}
+
+const registerVisibilityListener = () => {
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  window.addEventListener('blur', handleVisibilityChange)
+}
+
+const removeVisibilityListener = () => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  window.removeEventListener('blur', handleVisibilityChange)
+}
+
 const fetchExam = async () => {
   try {
-    const response = await request.get(`/api/exams/${route.params.id}`)
-    exam.value = response.data.data
-    // Initialize multiChoice arrays
-    if (exam.value.questions) {
-      exam.value.questions.forEach(eq => {
-        if (eq.question.type === 'MULTI_CHOICE') {
-          multiChoiceAnswers[eq.question.id] = []
-        }
-      })
+    if (isSessionMode.value) {
+      const entryRes = await enterSession(sessionId.value)
+      entryInfo.value = entryRes.data
+      screenSwitchCount.value = entryRes.data.screenSwitchCount ?? 0
+      screenSwitchLimit.value = entryRes.data.screenSwitchLimit ?? 3
+      const examRes = await getExam(entryRes.data.examId)
+      exam.value = examRes.data
+      initMultiChoice()
+      const durationSeconds = entryRes.data.durationMinutes * 60
+      startTimer(durationSeconds)
+      registerVisibilityListener()
+    } else {
+      const response = await getExam(route.params.id)
+      exam.value = response.data
+      initMultiChoice()
+      startTimer(exam.value.duration * 60)
     }
-    startTimer()
   } catch (error) {
     console.error('Failed to fetch exam:', error)
-    toast.error('加载考试失败')
+    if (isSessionMode.value && error.response?.data?.errorCode) {
+      entryDenied.value = true
+      deniedMessage.value = getErrorMessage(error, '无法进入考试')
+    } else {
+      toast.error(getErrorMessage(error, '加载考试失败'))
+    }
   } finally {
     loading.value = false
   }
@@ -461,7 +577,12 @@ const fetchExam = async () => {
 
 const showSubmitModal = ref(false)
 
+const goBack = () => {
+  router.push(isSessionMode.value ? '/sessions' : '/exams')
+}
+
 const confirmSubmit = () => {
+  if (submitting.value) return
   showSubmitModal.value = true
 }
 
@@ -470,22 +591,39 @@ const submitExam = async (force = false) => {
     showSubmitModal.value = true
     return
   }
-  
+
   showSubmitModal.value = false
 
   if (timerInterval) clearInterval(timerInterval)
+  if (submitting.value) return
+  submitting.value = true
 
   try {
-    const response = await request.post(`/api/exams/${route.params.id}/submit`, {
-      examId: parseInt(route.params.id),
-      answers: answers
-    })
-    result.value = response.data.data
+    let response
+    if (isSessionMode.value) {
+      response = await submitSessionExam(sessionId.value, {
+        reservationId: entryInfo.value.reservationId,
+        sessionId: sessionId.value,
+        answers: answers
+      })
+    } else {
+      response = await submitExamApi(route.params.id, {
+        examId: parseInt(route.params.id),
+        answers: answers
+      })
+    }
+    result.value = response.data
+    resultTimeout.value = !!response.data.timeout
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    toast.success('考试已提交！')
+    toast.success(resultTimeout.value ? '已超时，系统按超时记录本次作答' : '考试已提交！')
   } catch (error) {
     console.error('Failed to submit exam:', error)
-    toast.error('提交失败: ' + (error.response?.data?.message || error.message))
+    toast.error(getErrorMessage(error, '提交失败'))
+    if (isSessionMode.value && error.response?.data?.errorCode === 'RSV_SUBMISSION_TIMEOUT') {
+      resultTimeout.value = true
+    }
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -495,6 +633,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
+  removeVisibilityListener()
 })
 </script>
 
