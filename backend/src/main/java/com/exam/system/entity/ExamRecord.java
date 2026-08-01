@@ -24,11 +24,24 @@ public class ExamRecord {
     @JsonIgnore
     private Exam exam;
 
+    @ManyToOne
+    @JoinColumn(name = "session_id")
+    @JsonIgnore
+    private ExamSession session;
+
+    @ManyToOne
+    @JoinColumn(name = "reservation_id", unique = true)
+    @JsonIgnore
+    private SessionReservation reservation;
+
     private LocalDateTime startTime;
 
     private LocalDateTime submitTime;
 
     private Integer score;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer tabSwitchCount = 0;
 
     @OneToMany(mappedBy = "examRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExamAnswerDetail> details;

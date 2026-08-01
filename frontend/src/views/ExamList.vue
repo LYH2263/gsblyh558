@@ -36,8 +36,8 @@
               <span class="text-secondary small">
                 <i class="bi bi-star-fill text-warning me-1"></i>总分: {{ exam.totalScore }}
               </span>
-              <router-link :to="'/exam/' + exam.id" class="btn btn-primary px-4">
-                <span>开始考试</span>
+              <router-link to="/sessions" class="btn btn-primary px-4">
+                <span>预约场次</span>
                 <i class="bi bi-arrow-right-short"></i>
               </router-link>
             </div>
@@ -116,7 +116,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import request from '../utils/request'
+import { listExams } from '../api/exams'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -125,8 +125,8 @@ const loading = ref(true)
 
 const fetchExams = async () => {
   try {
-    const response = await request.get('/api/exams')
-    exams.value = response.data.data
+    const response = await listExams()
+    exams.value = response.data
   } catch (error) {
     console.error('Failed to fetch exams:', error)
   } finally {
