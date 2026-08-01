@@ -59,6 +59,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.error(400, "参数校验失败", errors));
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ReservationException.class)
+    public ResponseEntity<ApiResponse<String>> handleReservationException(ReservationException ex) {
+        log.warn("Reservation business error [{}]: {}", ex.getErrorCode().name(), ex.getMessage());
+        // 错误码字符串放入 data，前端据此展示中文提示，不依赖 message 字符串匹配
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(400, ex.getMessage(), ex.getErrorCode().name()));
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {

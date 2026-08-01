@@ -10,7 +10,21 @@
     <div v-else-if="result" class="row justify-content-center fade-in-up">
       <div class="col-md-10 col-lg-9">
         <div class="glass-panel text-center py-5 px-4" style="border-radius: 32px;">
-          <div class="mb-5">
+          <div v-if="forcedOut" class="mb-5">
+            <div class="timeout-circle mx-auto mb-4 d-flex flex-column justify-content-center align-items-center">
+              <i class="bi bi-shield-exclamation display-3"></i>
+            </div>
+            <h2 class="fw-bold mb-2">已被强制交卷</h2>
+            <p class="text-secondary mb-0">您的切屏次数已达上限，系统已按已作答内容记录本次作答</p>
+          </div>
+          <div v-else-if="timedOut" class="mb-5">
+            <div class="timeout-circle mx-auto mb-4 d-flex flex-column justify-content-center align-items-center">
+              <i class="bi bi-alarm display-3"></i>
+            </div>
+            <h2 class="fw-bold mb-2">作答超时</h2>
+            <p class="text-secondary mb-0">您已超出本场次的作答时间，系统已按超时结果记录本次作答</p>
+          </div>
+          <div v-else class="mb-5">
             <div class="score-circle mx-auto mb-4 d-flex flex-column justify-content-center align-items-center">
               <span class="score-number">{{ result.score }}</span>
               <span class="score-total">/ {{ exam.totalScore }}</span>
@@ -19,7 +33,7 @@
             <p class="text-secondary mb-0">系统已成功记录您的本次考试成绩</p>
           </div>
           
-          <div class="row g-4 mb-5 text-start px-md-5">
+          <div v-if="!timedOut && !forcedOut" class="row g-4 mb-5 text-start px-md-5">
             <div class="col-6 col-md-4">
               <div class="p-3 rounded-4 bg-light">
                 <div class="small text-secondary mb-1">考生</div>
@@ -98,6 +112,13 @@
             <h4 class="m-0 fw-bold text-truncate d-none d-sm-block" style="max-width: 400px;">{{ exam.title }}</h4>
           </div>
           <div class="d-flex align-items-center gap-4">
+            <div v-if="reservationId != null" class="text-end">
+              <div class="small text-secondary fw-600">切屏次数</div>
+              <div class="fw-bold fs-5 tabular-nums"
+                   :class="switchScreenCount > 0 ? 'text-danger' : 'text-secondary'">
+                {{ switchScreenCount }}<span v-if="switchThreshold != null" class="fs-6"> / {{ switchThreshold }}</span>
+              </div>
+            </div>
             <div class="text-end">
               <div class="small text-secondary fw-600">剩余时间</div>
               <div class="fw-bold fs-5 tabular-nums" :class="{'text-danger animate-pulse': timeLeft < 300}">
@@ -330,6 +351,15 @@
   font-weight: 600;
 }
 
+.timeout-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9500, #ff3b30);
+  color: white;
+  box-shadow: 0 12px 32px rgba(255, 149, 0, 0.3);
+}
+
 .fade-in { animation: fadeIn 0.6s ease-out; }
 .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
 
@@ -350,6 +380,8 @@ import { useRoute } from 'vue-router'
 import request from '../utils/request'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
+import { extractReservationErrorCode } from '../api/reservationErrors'
+import { reportSwitchScreen } from '../api/reservation'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -360,6 +392,21 @@ const answers = reactive({})
 const multiChoiceAnswers = reactive({})
 const result = ref(null)
 const showReview = ref(false)
+const timedOut = ref(false)
+const forcedOut = ref(false)
+
+// 本次作答关联的场次与预约（来自「场次预约」进入时的 query，命名沿用附录 A1）
+const sessionId = ref(route.query.sessionId ? Number(route.query.sessionId) : null)
+const reservationId = ref(route.query.reservationId ? Number(route.query.reservationId) : null)
+// 服务端下发的剩余作答秒数，倒计时以此为准（避免客户端时钟误差）
+const accessRemainingSeconds = ref(
+  route.query.remainingSeconds != null ? Number(route.query.remainingSeconds) : null
+)
+
+// 防切屏监考状态：累计切屏次数与后端返回的阈值
+const switchScreenCount = ref(0)
+const switchThreshold = ref(null)
+const finished = ref(false) // 已交卷/已结束，避免继续上报
 
 // Timer state
 const timeLeft = ref(0)
@@ -425,8 +472,13 @@ const pad = (num) => num.toString().padStart(2, '0')
 
 const startTimer = () => {
   if (!exam.value) return
-  timeLeft.value = exam.value.duration * 60 // convert to seconds
-  
+  // 场次预约进入时以服务端下发的剩余秒数为准；否则回退到考试时长
+  if (accessRemainingSeconds.value != null) {
+    timeLeft.value = Math.max(0, accessRemainingSeconds.value)
+  } else {
+    timeLeft.value = exam.value.duration * 60 // convert to seconds
+  }
+
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
@@ -470,32 +522,82 @@ const submitExam = async (force = false) => {
     showSubmitModal.value = true
     return
   }
-  
+
   showSubmitModal.value = false
 
   if (timerInterval) clearInterval(timerInterval)
 
+  const autoSubmitted = timeLeft.value <= 0
+
   try {
     const response = await request.post(`/api/exams/${route.params.id}/submit`, {
       examId: parseInt(route.params.id),
+      sessionId: sessionId.value,
+      reservationId: reservationId.value,
+      autoSubmitted,
       answers: answers
     })
+    finished.value = true
     result.value = response.data.data
     window.scrollTo({ top: 0, behavior: 'smooth' })
     toast.success('考试已提交！')
   } catch (error) {
+    // 服务端独立判定超时：成绩已按超时结果落库，返回 RSV_SUBMIT_TIMEOUT
+    const code = extractReservationErrorCode(error)
+    if (code === 'RSV_SUBMIT_TIMEOUT') {
+      finished.value = true
+      timedOut.value = true
+      result.value = { score: null, timeout: true }
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      toast.warning('已超出作答时间，本次作答按超时处理并已记录', 5000)
+      return
+    }
     console.error('Failed to submit exam:', error)
     toast.error('提交失败: ' + (error.response?.data?.message || error.message))
   }
 }
 
+// 页面可见性变化：用户每切走一次记一次并上报后端（累计次数落库）
+const handleVisibilityChange = async () => {
+  // 仅在场次作答途径、尚未结束、且是「切走」（隐藏）时上报
+  if (document.visibilityState !== 'hidden') return
+  if (finished.value || reservationId.value == null) return
+
+  try {
+    const res = await reportSwitchScreen(reservationId.value, answers)
+    const data = res.data.data
+    switchScreenCount.value = data.switchScreenCount
+    switchThreshold.value = data.threshold
+    if (switchThreshold.value != null) {
+      const remain = switchThreshold.value - switchScreenCount.value
+      toast.warning(`检测到切屏 ${switchScreenCount.value} 次，再切屏 ${remain} 次将被强制交卷`, 4000)
+    }
+  } catch (error) {
+    // 达到阈值：后端已强制交卷（FORCED）并返回错误码
+    const code = extractReservationErrorCode(error)
+    if (code === 'RSV_FORCED_SUBMIT_SWITCH') {
+      finished.value = true
+      forcedOut.value = true
+      if (timerInterval) clearInterval(timerInterval)
+      result.value = { score: null, forced: true }
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      toast.error('切屏次数已达上限，本次作答被强制交卷', 6000)
+      return
+    }
+    console.error('Failed to report switch-screen:', error)
+  }
+}
+
 onMounted(() => {
   fetchExam()
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
+
 </script>
 
 <style scoped>
