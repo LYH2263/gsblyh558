@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import request from '../utils/request'
+import { categoryApi } from '../api/categories'
+import { questionApi } from '../api/questions'
+import { practiceApi } from '../api/practice'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -44,7 +46,7 @@ const formatAnswer = (answer, type) => {
 const fetchCategories = async () => {
   loading.value = true
   try {
-    const res = await request.get('/api/categories')
+    const res = await categoryApi.list()
     categories.value = res.data.data
   } finally {
     loading.value = false
@@ -55,13 +57,11 @@ const startPractice = async () => {
   loading.value = true
   try {
     const sortField = practiceMode.value === 'random' ? 'random' : 'id'
-    const res = await request.get('/api/questions', {
-      params: { 
-        size: 100,
-        categoryId: selectedCategoryId.value,
-        sortField: sortField,
-        sortDir: 'asc'
-      }
+    const res = await questionApi.list({
+      size: 100,
+      categoryId: selectedCategoryId.value,
+      sortField: sortField,
+      sortDir: 'asc'
     })
     
     questions.value = res.data.data.content
@@ -81,7 +81,7 @@ const submitAnswer = async () => {
     userAnswer.value = multiChoiceAnswers.value.sort().join(',')
   }
 
-  const res = await request.post('/api/practice/submit', {
+  const res = await practiceApi.submit({
     questionId: question.id,
     userAnswer: userAnswer.value
   })

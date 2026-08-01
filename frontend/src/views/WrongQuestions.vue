@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import request from '../utils/request'
+import { wrongQuestionApi } from '../api/wrongQuestions'
+import { practiceApi } from '../api/practice'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -41,7 +42,7 @@ const formatAnswer = (answer, type) => {
 const fetchWrongQuestions = async () => {
   loading.value = true
   try {
-    const res = await request.get('/api/wrong-questions')
+    const res = await wrongQuestionApi.list()
     wrongRecords.value = res.data.data
   } finally {
     loading.value = false
@@ -56,7 +57,7 @@ const submitAnswer = async () => {
     userAnswer.value = multiChoiceAnswers.value.sort().join(',')
   }
   
-  const res = await request.post('/api/practice/submit', {
+  const res = await practiceApi.submit({
     questionId: question.id,
     userAnswer: userAnswer.value
   })

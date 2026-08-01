@@ -116,7 +116,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import request from '../utils/request'
+import { examApi } from '../api/exams'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -125,7 +125,7 @@ const loading = ref(true)
 
 const fetchExams = async () => {
   try {
-    const response = await request.get('/api/exams')
+    const response = await examApi.list()
     exams.value = response.data.data
   } catch (error) {
     console.error('Failed to fetch exams:', error)

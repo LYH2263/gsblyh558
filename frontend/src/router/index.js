@@ -44,6 +44,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/sessions',
+      name: 'sessions',
+      component: () => import('../views/SessionBooking.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/exam/:id',
       name: 'take-exam',
       component: () => import('../views/TakeExam.vue'),

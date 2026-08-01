@@ -6,7 +6,28 @@
       </div>
       <p class="mt-3 text-secondary">正在为您准备试卷...</p>
     </div>
-    
+
+    <!-- 开考准入失败：按错误码展示不同文案 -->
+    <div v-else-if="accessError" class="row justify-content-center fade-in-up">
+      <div class="col-md-8 col-lg-6">
+        <div class="glass-panel text-center py-5 px-4" style="border-radius: 32px;">
+          <div class="mb-4">
+            <i class="bi display-1" :class="accessError.code === 'RSV_SESSION_NOT_STARTED' ? 'bi-hourglass-top text-primary' : 'bi-shield-lock text-danger'"></i>
+          </div>
+          <h2 class="fw-bold mb-3 h3">暂时无法进入考试</h2>
+          <p class="text-secondary fs-5 mb-5">{{ accessError.message }}</p>
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <router-link to="/sessions" class="btn btn-primary px-5 py-3 rounded-4 shadow-sm">
+              <span>前往场次预约</span>
+            </router-link>
+            <router-link to="/" class="btn btn-secondary px-5 py-3 rounded-4">
+              <span>回到首页</span>
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-else-if="result" class="row justify-content-center fade-in-up">
       <div class="col-md-10 col-lg-9">
         <div class="glass-panel text-center py-5 px-4" style="border-radius: 32px;">
@@ -17,6 +38,12 @@
             </div>
             <h2 class="fw-bold mb-2">考试已完成</h2>
             <p class="text-secondary mb-0">系统已成功记录您的本次考试成绩</p>
+            <p v-if="result.finishType === 'FORCED'" class="text-danger fw-bold mt-2 mb-0">
+              <i class="bi bi-exclamation-triangle-fill me-1"></i>因切屏次数达到上限，本次考试被强制交卷
+            </p>
+            <p v-else-if="result.finishType === 'TIMEOUT'" class="text-warning fw-bold mt-2 mb-0">
+              <i class="bi bi-clock-history me-1"></i>作答时间已到，本次考试由系统自动交卷
+            </p>
           </div>
           
           <div class="row g-4 mb-5 text-start px-md-5">
@@ -30,6 +57,12 @@
               <div class="p-3 rounded-4 bg-light">
                 <div class="small text-secondary mb-1">考试时长</div>
                 <div class="fw-bold">{{ exam.duration }} 分钟</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4" v-if="result.usedMinutes !== null && result.usedMinutes !== undefined">
+              <div class="p-3 rounded-4 bg-light">
+                <div class="small text-secondary mb-1">作答用时</div>
+                <div class="fw-bold">{{ result.usedMinutes }} 分钟</div>
               </div>
             </div>
             <div class="col-12 col-md-4">
@@ -98,6 +131,12 @@
             <h4 class="m-0 fw-bold text-truncate d-none d-sm-block" style="max-width: 400px;">{{ exam.title }}</h4>
           </div>
           <div class="d-flex align-items-center gap-4">
+            <div class="text-end" v-if="sessionInfo">
+              <div class="small text-secondary fw-600">切屏次数</div>
+              <div class="fw-bold fs-5 tabular-nums" :class="{ 'text-danger animate-pulse': switchCount > 0 }">
+                {{ switchCount }}/{{ sessionInfo.maxSwitchCount }}
+              </div>
+            </div>
             <div class="text-end">
               <div class="small text-secondary fw-600">剩余时间</div>
               <div class="fw-bold fs-5 tabular-nums" :class="{'text-danger animate-pulse': timeLeft < 300}">
@@ -347,7 +386,9 @@
 <script setup>
 import { ref, onMounted, reactive, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import request from '../utils/request'
+import { examApi } from '../api/exams'
+import { sessionApi } from '../api/sessions'
+import { reservationApi } from '../api/reservations'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
 
@@ -360,6 +401,32 @@ const answers = reactive({})
 const multiChoiceAnswers = reactive({})
 const result = ref(null)
 const showReview = ref(false)
+
+// 开考准入状态
+const sessionInfo = ref(null)
+const accessError = ref(null)
+
+// 防切屏监考状态（累计次数以后端落库为准）
+const switchCount = ref(0)
+
+// A5: 按后端 RSV_ 业务错误码分别展示准入失败文案
+const ACCESS_ERROR_MESSAGES = {
+  RSV_NOT_RESERVED: '您尚未预约该场次，请先在「场次预约」页完成预约',
+  RSV_RESERVATION_CANCELLED: '您的预约已取消，无法进入本次考试',
+  RSV_SESSION_NOT_STARTED: '该场次尚未开始，请到达开始时间后再进入',
+  RSV_SESSION_ENDED: '该场次已结束，无法进入考试',
+  RSV_SESSION_NOT_FOUND: '场次不存在或已下线',
+  RSV_SUBMIT_TIMEOUT: '已超出作答窗口，本次作答已按超时交卷处理',
+  RSV_ALREADY_SUBMITTED: '本场次已交卷，无法继续作答'
+}
+
+const rsvErrorMessage = (error, fallback) => {
+  const data = error?.response?.data
+  if (data?.errorCode && ACCESS_ERROR_MESSAGES[data.errorCode]) {
+    return ACCESS_ERROR_MESSAGES[data.errorCode]
+  }
+  return data?.message || fallback
+}
 
 // Timer state
 const timeLeft = ref(0)
@@ -425,8 +492,14 @@ const pad = (num) => num.toString().padStart(2, '0')
 
 const startTimer = () => {
   if (!exam.value) return
-  timeLeft.value = exam.value.duration * 60 // convert to seconds
-  
+  if (sessionInfo.value?.endTime) {
+    // 以服务端下发的作答窗口截止时间为准，本地每秒重算剩余秒数
+    const endTs = new Date(sessionInfo.value.endTime).getTime()
+    timeLeft.value = Math.max(0, Math.floor((endTs - Date.now()) / 1000))
+  } else {
+    timeLeft.value = exam.value.duration * 60 // convert to seconds
+  }
+
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
@@ -439,8 +512,28 @@ const startTimer = () => {
 }
 
 const fetchExam = async () => {
+  // 开考准入：必须携带 sessionId 且通过服务端准入校验
+  const sessionId = route.query.sessionId ? parseInt(route.query.sessionId) : null
+  if (!sessionId) {
+    accessError.value = { code: 'RSV_NOT_RESERVED', message: ACCESS_ERROR_MESSAGES.RSV_NOT_RESERVED }
+    loading.value = false
+    return
+  }
   try {
-    const response = await request.get(`/api/exams/${route.params.id}`)
+    const accessRes = await sessionApi.checkAccess(sessionId)
+    sessionInfo.value = accessRes.data.data
+  } catch (error) {
+    console.error('Access denied:', error)
+    accessError.value = {
+      code: error.response?.data?.errorCode || '',
+      message: rsvErrorMessage(error, '无法进入考试')
+    }
+    loading.value = false
+    return
+  }
+
+  try {
+    const response = await examApi.get(route.params.id)
     exam.value = response.data.data
     // Initialize multiChoice arrays
     if (exam.value.questions) {
@@ -461,6 +554,25 @@ const fetchExam = async () => {
 
 const showSubmitModal = ref(false)
 
+// 切屏监听：页面不可见即上报后端累计，达上限由后端判定并强制交卷
+const handleVisibilityChange = async () => {
+  if (!document.hidden) return
+  if (!exam.value || result.value || !sessionInfo.value?.reservationId) return
+  try {
+    const res = await reservationApi.reportSwitch(sessionInfo.value.reservationId)
+    const data = res.data.data
+    switchCount.value = data.switchCount
+    if (data.forceSubmit) {
+      toast.error(`切屏次数已达上限（${data.maxSwitchCount} 次），系统将强制交卷！`, 5000)
+      submitExam(true)
+    } else {
+      toast.warning(`警告：您已切屏 ${data.switchCount}/${data.maxSwitchCount} 次，达到上限将被强制交卷！`, 4000)
+    }
+  } catch (error) {
+    console.error('Failed to report screen switch:', error)
+  }
+}
+
 const confirmSubmit = () => {
   showSubmitModal.value = true
 }
@@ -476,8 +588,10 @@ const submitExam = async (force = false) => {
   if (timerInterval) clearInterval(timerInterval)
 
   try {
-    const response = await request.post(`/api/exams/${route.params.id}/submit`, {
+    const response = await examApi.submit(route.params.id, {
       examId: parseInt(route.params.id),
+      sessionId: sessionInfo.value?.sessionId ?? null,
+      reservationId: sessionInfo.value?.reservationId ?? null,
       answers: answers
     })
     result.value = response.data.data
@@ -485,15 +599,22 @@ const submitExam = async (force = false) => {
     toast.success('考试已提交！')
   } catch (error) {
     console.error('Failed to submit exam:', error)
-    toast.error('提交失败: ' + (error.response?.data?.message || error.message))
+    if (error.response?.data?.errorCode === 'RSV_SUBMIT_TIMEOUT') {
+      // 服务端已按超时落库本次作答
+      toast.error(ACCESS_ERROR_MESSAGES.RSV_SUBMIT_TIMEOUT)
+    } else {
+      toast.error('提交失败: ' + (error.response?.data?.message || error.message))
+    }
   }
 }
 
 onMounted(() => {
+  document.addEventListener('visibilitychange', handleVisibilityChange)
   fetchExam()
 })
 
 onUnmounted(() => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
   if (timerInterval) clearInterval(timerInterval)
 })
 </script>
