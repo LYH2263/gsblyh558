@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
-import request from '../utils/request'
-
-const API_URL = '/api/auth/'
+import { signin, signup } from '../api/auth'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -9,22 +7,19 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     async login(username, password) {
-      const response = await request.post(API_URL + 'signin', {
-        username,
-        password
-      })
-      if (response.data.data && response.data.data.token) {
-        localStorage.setItem('user', JSON.stringify(response.data.data))
-        this.user = response.data.data
+      const response = await signin({ username, password })
+      if (response.data && response.data.token) {
+        localStorage.setItem('user', JSON.stringify(response.data))
+        this.user = response.data
       }
-      return response.data
+      return response
     },
     logout() {
       localStorage.removeItem('user')
       this.user = null
     },
     async register(user) {
-      return request.post(API_URL + 'signup', user)
+      return signup(user)
     }
   }
 })

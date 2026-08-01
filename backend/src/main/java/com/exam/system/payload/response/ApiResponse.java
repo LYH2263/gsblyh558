@@ -8,14 +8,20 @@ public class ApiResponse<T> {
     private String message;
     private T data;
     private int code;
+    private String errorCode;
 
     public ApiResponse() {}
 
     public ApiResponse(boolean success, String message, T data, int code) {
+        this(success, message, data, code, null);
+    }
+
+    public ApiResponse(boolean success, String message, T data, int code, String errorCode) {
         this.success = success;
         this.message = message;
         this.data = data;
         this.code = code;
+        this.errorCode = errorCode;
     }
 
     public static <T> ApiResponse<T> success(T data) {
@@ -32,5 +38,13 @@ public class ApiResponse<T> {
     
     public static <T> ApiResponse<T> error(int code, String message, T data) {
         return new ApiResponse<>(false, message, data, code);
+    }
+
+    public static <T> ApiResponse<T> error(int code, String message, String errorCode) {
+        return new ApiResponse<>(false, message, null, code, errorCode);
+    }
+
+    public static <T> ApiResponse<T> error(int code, String message, String errorCode, T data) {
+        return new ApiResponse<>(false, message, data, code, errorCode);
     }
 }

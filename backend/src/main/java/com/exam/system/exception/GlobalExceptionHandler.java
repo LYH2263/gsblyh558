@@ -67,6 +67,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(404, ex.getMessage()));
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
+        log.warn("Business exception: {} - {}", ex.getErrorCode(), ex.getMessage());
+        return ResponseEntity.status(ex.getStatus())
+                .body(ApiResponse.error(ex.getStatus().value(), ex.getMessage(), ex.getErrorCode()));
+    }
+
     // Optional: Handle other runtime exceptions globally
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGlobalException(Exception ex) {

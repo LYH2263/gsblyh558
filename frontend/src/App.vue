@@ -34,6 +34,9 @@ const logout = () => {
               <RouterLink class="nav-link" to="/exams">考试</RouterLink>
             </li>
             <li class="nav-item" v-if="authStore.user">
+              <RouterLink class="nav-link" to="/sessions">场次预约</RouterLink>
+            </li>
+            <li class="nav-item" v-if="authStore.user">
               <RouterLink class="nav-link" to="/wrong-questions">错题本</RouterLink>
             </li>
             <li class="nav-item" v-if="authStore.user?.roles?.includes('ROLE_ADMIN')">

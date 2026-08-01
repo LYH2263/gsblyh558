@@ -24,7 +24,23 @@ public class ExamResult {
     @JsonIgnore
     private Exam exam;
 
+    @ManyToOne
+    @JoinColumn(name = "session_id")
+    @JsonIgnore
+    private ExamSession session;
+
+    @ManyToOne
+    @JoinColumn(name = "reservation_id")
+    @JsonIgnore
+    private SessionReservation reservation;
+
     private Integer score;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private Boolean timedOut = false;
+
+    @Enumerated(EnumType.STRING)
+    private ForcedSubmitReason forcedSubmitReason;
 
     @CreationTimestamp
     private LocalDateTime submitTime;

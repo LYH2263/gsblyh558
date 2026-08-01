@@ -6,7 +6,20 @@
       </div>
       <p class="mt-3 text-secondary">正在为您准备试卷...</p>
     </div>
-    
+
+    <div v-else-if="accessError" class="row justify-content-center fade-in-up">
+      <div class="col-md-8 col-lg-6">
+        <div class="glass-panel text-center py-5 px-4" style="border-radius: 32px;">
+          <i class="bi bi-shield-exclamation display-1 text-danger d-block mb-3"></i>
+          <h2 class="fw-bold mb-3">无法进入考试</h2>
+          <p class="text-secondary fs-5 mb-4">{{ accessError }}</p>
+          <router-link to="/sessions" class="btn btn-primary btn-lg px-5 py-3 shadow-sm rounded-4">
+            返回我的预约
+          </router-link>
+        </div>
+      </div>
+    </div>
+
     <div v-else-if="result" class="row justify-content-center fade-in-up">
       <div class="col-md-10 col-lg-9">
         <div class="glass-panel text-center py-5 px-4" style="border-radius: 32px;">
@@ -15,7 +28,7 @@
               <span class="score-number">{{ result.score }}</span>
               <span class="score-total">/ {{ exam.totalScore }}</span>
             </div>
-            <h2 class="fw-bold mb-2">考试已完成</h2>
+            <h2 class="fw-bold mb-2">{{ isTimedOut ? '考试已超时交卷' : '考试已完成' }}</h2>
             <p class="text-secondary mb-0">系统已成功记录您的本次考试成绩</p>
           </div>
           
@@ -47,8 +60,8 @@
               <span>{{ showReview ? '隐藏解析' : '查看解析' }}</span>
               <i class="bi ms-2" :class="showReview ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
             </button>
-            <router-link to="/exams" class="btn btn-primary btn-lg px-4 px-md-5 py-3 shadow-sm rounded-4">
-              <span>返回列表</span>
+            <router-link to="/sessions" class="btn btn-primary btn-lg px-4 px-md-5 py-3 shadow-sm rounded-4">
+              <span>返回预约</span>
             </router-link>
             <router-link to="/" class="btn btn-secondary btn-lg px-4 px-md-5 py-3 rounded-4">
               <span>回到首页</span>
@@ -92,12 +105,16 @@
       <div class="sticky-top glass-nav py-3 mb-5" style="z-index: 1020; top: 0; margin-top: 0; margin-left: -1rem; margin-right: -1rem;">
         <div class="container d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-secondary btn-sm p-2 rounded-3" @click="$router.push('/exams')">
+            <button class="btn btn-secondary btn-sm p-2 rounded-3" @click="$router.push('/sessions')">
               <i class="bi bi-chevron-left"></i>
             </button>
             <h4 class="m-0 fw-bold text-truncate d-none d-sm-block" style="max-width: 400px;">{{ exam.title }}</h4>
           </div>
           <div class="d-flex align-items-center gap-4">
+            <div v-if="tabSwitchCount > 0" class="text-end" :class="{'tab-warning': tabSwitchCount < tabSwitchLimit, 'tab-danger': tabSwitchCount >= tabSwitchLimit}">
+              <div class="small fw-600">切屏次数</div>
+              <div class="fw-bold fs-5 tabular-nums">{{ tabSwitchCount }} / {{ tabSwitchLimit }}</div>
+            </div>
             <div class="text-end">
               <div class="small text-secondary fw-600">剩余时间</div>
               <div class="fw-bold fs-5 tabular-nums" :class="{'text-danger animate-pulse': timeLeft < 300}">
@@ -109,12 +126,21 @@
         </div>
       </div>
 
+      <div v-if="tabSwitchCount > 0 && tabSwitchCount < tabSwitchLimit" class="alert alert-warning d-flex align-items-center gap-2 rounded-4 mb-4">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>检测到切屏，已记录 <strong>{{ tabSwitchCount }}</strong> 次。累计达到 <strong>{{ tabSwitchLimit }}</strong> 次将被强制交卷。</span>
+      </div>
+      <div v-if="tabSwitchCount >= tabSwitchLimit" class="alert alert-danger d-flex align-items-center gap-2 rounded-4 mb-4">
+        <i class="bi bi-shield-exclamation"></i>
+        <span>已达到切屏上限，系统正在强制交卷。</span>
+      </div>
+
       <div class="row">
         <div class="col-lg-9 mx-auto">
           <div class="glass-panel mb-5 p-4" style="border-radius: 20px;">
             <p class="text-secondary mb-3">{{ exam.description }}</p>
             <div class="d-flex flex-wrap gap-4 text-secondary small fw-600">
-              <span><i class="bi bi-clock-history me-2"></i>限时: {{ exam.duration }} 分钟</span>
+              <span><i class="bi bi-clock-history me-2"></i>限时: {{ access?.durationMinutes || exam.duration }} 分钟</span>
               <span><i class="bi bi-list-check me-2"></i>题目: {{ exam.questions.length }} 题</span>
               <span><i class="bi bi-award me-2"></i>总分: {{ exam.totalScore }} 分</span>
             </div>
@@ -347,7 +373,8 @@
 <script setup>
 import { ref, onMounted, reactive, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import request from '../utils/request'
+import { getExam, submitExam as submitExamRequest } from '../api/exams'
+import { getReservationAccess, reportTabSwitch } from '../api/reservations'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
 
@@ -355,15 +382,22 @@ const route = useRoute()
 const authStore = useAuthStore()
 const toast = useToast()
 const exam = ref(null)
+const access = ref(null)
+const accessError = ref('')
 const loading = ref(true)
 const answers = reactive({})
 const multiChoiceAnswers = reactive({})
 const result = ref(null)
+const isTimedOut = ref(false)
 const showReview = ref(false)
+const submitting = ref(false)
 
-// Timer state
 const timeLeft = ref(0)
+const tabSwitchCount = ref(0)
+const tabSwitchLimit = ref(3)
+const forceSubmittedByTabSwitch = ref(false)
 let timerInterval = null
+let examEndTime = 0
 
 const parseOptions = (options) => {
   if (!options) return []
@@ -376,7 +410,7 @@ const parseOptions = (options) => {
 }
 
 const getOptionLabel = (index) => {
-  return String.fromCharCode(65 + index) // A, B, C...
+  return String.fromCharCode(65 + index)
 }
 
 const formatAnswer = (answer, type) => {
@@ -393,11 +427,11 @@ const formatAnswer = (answer, type) => {
 
 const getQuestionTypeLabel = (type) => {
   const map = {
-    'SINGLE_CHOICE': '单选题',
-    'MULTI_CHOICE': '多选题',
-    'TRUE_FALSE': '判断题',
-    'FILL_IN_BLANK': '填空题',
-    'SHORT_ANSWER': '简答题'
+    SINGLE_CHOICE: '单选题',
+    MULTI_CHOICE: '多选题',
+    TRUE_FALSE: '判断题',
+    FILL_IN_BLANK: '填空题',
+    SHORT_ANSWER: '简答题'
   }
   return map[type] || '题目'
 }
@@ -406,15 +440,15 @@ const updateMultiChoice = (questionId) => {
   if (!multiChoiceAnswers[questionId]) {
     multiChoiceAnswers[questionId] = []
   }
-  // Sort and join
   answers[questionId] = multiChoiceAnswers[questionId].sort().join(',')
 }
 
 const formatTime = (seconds) => {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = seconds % 60
-  
+  const safeSeconds = Math.max(0, seconds)
+  const h = Math.floor(safeSeconds / 3600)
+  const m = Math.floor((safeSeconds % 3600) / 60)
+  const s = safeSeconds % 60
+
   if (h > 0) {
     return `${h}:${pad(m)}:${pad(s)}`
   }
@@ -423,37 +457,86 @@ const formatTime = (seconds) => {
 
 const pad = (num) => num.toString().padStart(2, '0')
 
+const getAccessMessage = (errorCode, message) => {
+  const messages = {
+    RSV_NO_RESERVATION: '未找到有效预约，请从“我的预约”进入考试。',
+    RSV_SESSION_NOT_STARTED: '考试尚未开始，请在开考后再进入。',
+    RSV_SESSION_ENDED: '考试已结束，不能进入答题。',
+    RSV_RESERVATION_CANCELLED: '该预约已取消，不能进入考试。',
+    RSV_LATE_GRACE_EXCEEDED: '已超过迟到入场宽限时间，不能进入考试。',
+    RSV_SESSION_NOT_AVAILABLE: '该场次当前不可进入。'
+  }
+  return messages[errorCode] || message || '考试准入校验失败'
+}
+
 const startTimer = () => {
-  if (!exam.value) return
-  timeLeft.value = exam.value.duration * 60 // convert to seconds
-  
+  if (!access.value) return
+
+  const clientNow = Date.now()
+  const serverNow = new Date(access.value.serverTime).getTime()
+  const skew = clientNow - serverNow
+  const sessionStart = new Date(access.value.startTime).getTime()
+  examEndTime = sessionStart + access.value.durationMinutes * 60000 + skew
+  timeLeft.value = Math.max(0, Math.floor((examEndTime - Date.now()) / 1000))
+
   timerInterval = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value--
-    } else {
+    const remaining = Math.max(0, Math.floor((examEndTime - Date.now()) / 1000))
+    timeLeft.value = remaining
+    if (remaining <= 0) {
       clearInterval(timerInterval)
       toast.warning('考试时间到，系统将自动提交试卷！', 5000)
-      submitExam(true) // force submit
+      submitExam(true)
     }
   }, 1000)
 }
 
-const fetchExam = async () => {
+const handleVisibilityChange = async () => {
+  if (document.visibilityState !== 'hidden') return
+  if (submitting.value || result.value || !access.value) return
   try {
-    const response = await request.get(`/api/exams/${route.params.id}`)
-    exam.value = response.data.data
-    // Initialize multiChoice arrays
-    if (exam.value.questions) {
-      exam.value.questions.forEach(eq => {
-        if (eq.question.type === 'MULTI_CHOICE') {
-          multiChoiceAnswers[eq.question.id] = []
-        }
-      })
+    const res = await reportTabSwitch(access.value.reservationId)
+    tabSwitchCount.value = res.data.count
+    if (res.data.thresholdExceeded) {
+      forceSubmittedByTabSwitch.value = true
+      toast.error(`已累计切屏 ${res.data.count} 次，达到上限，系统将强制交卷！`, 5000)
+      submitExam(true, 'TAB_SWITCH')
+    } else {
+      toast.warning(`检测到切屏，已记录 ${res.data.count} 次；累计达到 ${res.data.limit} 次将强制交卷。`, 4000)
     }
+  } catch (error) {
+    console.error('Failed to report tab switch:', error)
+  }
+}
+
+const initializeMultiChoice = (examData) => {
+  if (!examData.questions) return
+  examData.questions.forEach(eq => {
+    if (eq.question.type === 'MULTI_CHOICE') {
+      multiChoiceAnswers[eq.question.id] = []
+    }
+  })
+}
+
+const fetchExam = async () => {
+  const reservationId = route.query.reservationId
+  if (!reservationId) {
+    accessError.value = '请从“我的预约”进入对应场次考试。'
+    loading.value = false
+    return
+  }
+
+  try {
+    const accessResponse = await getReservationAccess(reservationId)
+    access.value = accessResponse.data
+    tabSwitchCount.value = access.value.tabSwitchCount || 0
+    tabSwitchLimit.value = access.value.tabSwitchLimit || 3
+    const examResponse = await getExam(access.value.examId)
+    exam.value = examResponse.data
+    initializeMultiChoice(exam.value)
     startTimer()
   } catch (error) {
-    console.error('Failed to fetch exam:', error)
-    toast.error('加载考试失败')
+    console.error('Failed to fetch exam access:', error)
+    accessError.value = getAccessMessage(error.response?.data?.errorCode, error.response?.data?.message)
   } finally {
     loading.value = false
   }
@@ -465,42 +548,65 @@ const confirmSubmit = () => {
   showSubmitModal.value = true
 }
 
-const submitExam = async (force = false) => {
+const submitExam = async (force = false, forcedSubmitReason = null) => {
   if (!force) {
     showSubmitModal.value = true
     return
   }
-  
-  showSubmitModal.value = false
+  if (submitting.value || !access.value) return
 
+  showSubmitModal.value = false
+  submitting.value = true
   if (timerInterval) clearInterval(timerInterval)
 
   try {
-    const response = await request.post(`/api/exams/${route.params.id}/submit`, {
-      examId: parseInt(route.params.id),
-      answers: answers
+    const response = await submitExamRequest(access.value.examId, {
+      examId: access.value.examId,
+      sessionId: access.value.sessionId,
+      reservationId: access.value.reservationId,
+      forcedSubmitReason,
+      answers
     })
-    result.value = response.data.data
+    result.value = response.data
     window.scrollTo({ top: 0, behavior: 'smooth' })
     toast.success('考试已提交！')
   } catch (error) {
     console.error('Failed to submit exam:', error)
-    toast.error('提交失败: ' + (error.response?.data?.message || error.message))
+    if (error.response?.status === 400 && error.response?.data?.errorCode === 'RSV_SESSION_ENDED' && error.response?.data?.data) {
+      result.value = error.response.data.data
+      isTimedOut.value = true
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      toast.warning('考试已超时，系统已按超时交卷处理。')
+    } else {
+      toast.error('提交失败: ' + (error.response?.data?.message || error.message))
+      submitting.value = false
+      if (timeLeft.value > 0) startTimer()
+    }
   }
 }
 
 onMounted(() => {
   fetchExam()
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 
 <style scoped>
 .take-exam {
-  max-width: 900px;
+  max-width: 1000px;
+}
+
+.tab-warning {
+  color: var(--apple-orange);
+}
+
+.tab-danger {
+  color: var(--apple-red);
 }
 .sticky-top {
   box-shadow: var(--shadow-sm);
